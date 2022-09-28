@@ -5,6 +5,7 @@ import pt.ipleiria.estg.dei.ei.dae.academics.entities.Student;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 @Stateless
 public class StudentBean {
@@ -17,4 +18,7 @@ public class StudentBean {
         em.persist(student);
     }
 
+    public List<Student> getAll() {
+        return em.createNamedQuery("getAllStudents").getResultList();
+    }
 }
