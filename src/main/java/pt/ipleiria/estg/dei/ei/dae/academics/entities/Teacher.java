@@ -1,44 +1,37 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.entities;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@NamedQueries({
-        @NamedQuery(
-                name = "getAllStudents",
-                query = "SELECT s FROM Student s ORDER BY s.name"
-        )
-})
-public class Student extends User {
+public class Teacher extends User {
 
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "course_code")
-    @NotNull
-    private Course course;
+    private String office;
 
-    @ManyToMany(mappedBy = "students", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "teachers", fetch = FetchType.EAGER)
     private List<Subject> subjects;
 
-    public Student() {
+    public Teacher() {
         this.subjects = new ArrayList<>();
     }
 
-    public Student(String username, String password, String name, String email, Course course) {
+    public Teacher(String username, String password, String name, String email, String office) {
         super(username, password, name, email);
-        this.course = course;
+        this.office = office;
         this.subjects = new ArrayList<>();
     }
 
-    public Course getCourse() {
-        return course;
+    public String getOffice() {
+        return office;
     }
 
-    public void setCourse(Course course) {
-        this.course = course;
+    public void setOffice(String office) {
+        this.office = office;
     }
 
     public List<Subject> getSubjects() {

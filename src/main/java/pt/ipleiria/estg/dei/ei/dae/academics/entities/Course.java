@@ -4,6 +4,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "courses", uniqueConstraints = @UniqueConstraint(columnNames = {"name"}))
@@ -16,7 +17,6 @@ import java.util.List;
 public class Course {
 
     @Id
-    @GeneratedValue
     private Long code;
 
     @NotNull
@@ -25,12 +25,17 @@ public class Course {
     @OneToMany(mappedBy = "course", cascade = CascadeType.REMOVE)
     private List<Student> students;
 
+    @OneToMany(mappedBy = "course", cascade = CascadeType.REMOVE)
+    private List<Subject> subjects;
+
     public Course() {
         this.students = new ArrayList<>();
+        this.subjects = new ArrayList<>();
     }
 
-    public Course(String name) {
+    public Course(Long code, String name) {
         this();
+        this.code = code;
         this.name = name;
     }
 
@@ -58,6 +63,14 @@ public class Course {
         this.students = students;
     }
 
+    public List<Subject> getSubjects() {
+        return subjects;
+    }
+
+    public void setSubjects(List<Subject> subjects) {
+        this.subjects = subjects;
+    }
+
     public void addStudent(Student student) {
         if (! this.students.contains(student)) {
             this.students.add(student);
@@ -66,5 +79,25 @@ public class Course {
 
     public void removeStudent(Student student) {
         this.students.remove(student);
+    }
+
+    public void addSubject(Subject subject) {
+        if (! this.subjects.contains(subject)) {
+            this.subjects.add(subject);
+        }
+    }
+
+    public void removeSubject(Subject subject) {
+        this.subjects.remove(subject);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Course && Objects.equals(((Course) obj).code, this.code);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(code, name);
     }
 }

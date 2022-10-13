@@ -13,14 +13,16 @@ public class CourseBean {
     @PersistenceContext
     private EntityManager em;
 
-    public Long create(String name) {
-        var course = new Course(name);
+    public void create(Long code, String name) {
+        var course = new Course(code, name);
         em.persist(course);
-
-        return course.getCode();
     }
 
     public List<Course> getAll() {
         return em.createNamedQuery("getAllCourses", Course.class).getResultList();
+    }
+
+    public Course find(Long courseCode) {
+        return em.find(Course.class, courseCode);
     }
 }

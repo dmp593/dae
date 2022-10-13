@@ -1,7 +1,9 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.ws;
 
 
+import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.StudentDTO;
+import pt.ipleiria.estg.dei.ei.dae.academics.dtos.SubjectDTO;
 import pt.ipleiria.estg.dei.ei.dae.academics.ejbs.StudentBean;
 import pt.ipleiria.estg.dei.ei.dae.academics.entities.Student;
 
@@ -23,8 +25,33 @@ public class StudentService {
     @GET
     @Path("/")
     public List<StudentDTO> getAll() {
-        return toDTOs(studentBean.getAll());
+        return StudentDTO.from(studentBean.getAll());
     }
+
+    @GET
+    @Path("{username}")
+    public Response get(@PathParam("username") String username) {
+        Student student = studentBean.find(username);
+
+        if (student == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("STUDENT_NOT_FOUND").build();
+        }
+
+        return Response.ok(StudentDTO.from(student)).build();
+    }
+
+
+    @GET
+    @Path("{username}/subjects")
+    public Response subjects(@PathParam("username") String username) {
+        Student student = studentBean.find(username);
+        if (student == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("STUDENT_NOT_FOUND").build();
+        }
+
+        return Response.ok(SubjectDTO.from(student.getSubjects())).build();
+    }
+
 
     @POST
     @Path("/")
@@ -40,21 +67,6 @@ public class StudentService {
         var student = studentBean.find(studentDTO.getUsername());
         if(student == null) return Response.status(Response.Status.BAD_REQUEST).build();
 
-        return Response.status(Response.Status.CREATED).entity(toDTO(student)).build();
-    }
-
-    private StudentDTO toDTO(Student student) {
-        return new StudentDTO(
-                student.getUsername(),
-                student.getPassword(),
-                student.getName(),
-                student.getEmail(),
-                student.getCourse().getCode(),
-                student.getCourse().getName()
-        );
-    }
-
-    private List<StudentDTO> toDTOs(List<Student> students) {
-        return students.stream().map(this::toDTO).collect(Collectors.toList());
+        return Response.status(Response.Status.CREATED).entity(StudentDTO.from(student)).build();
     }
 }

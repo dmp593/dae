@@ -21,10 +21,10 @@ build:
 bash:
 	docker compose exec webserver bash
 
-logs: up
+logs:
 	docker compose logs -f webserver
 
-sql: up
+sql:
 	docker compose exec db psql --username ${DB_USER} --password ${DB_NAME}
 
 ps:

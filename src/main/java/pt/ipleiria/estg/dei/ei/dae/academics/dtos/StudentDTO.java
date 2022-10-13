@@ -1,6 +1,10 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.dtos;
 
+import pt.ipleiria.estg.dei.ei.dae.academics.entities.Student;
+
 import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class StudentDTO implements Serializable {
 
@@ -70,5 +74,20 @@ public class StudentDTO implements Serializable {
 
     public void setCourseName(String courseName) {
         this.courseName = courseName;
+    }
+
+    public static StudentDTO from(Student student) {
+        return new StudentDTO(
+                student.getUsername(),
+                student.getPassword(),
+                student.getName(),
+                student.getEmail(),
+                student.getCourse().getCode(),
+                student.getCourse().getName()
+        );
+    }
+
+    public static List<StudentDTO> from(List<Student> students) {
+        return students.stream().map(StudentDTO::from).collect(Collectors.toList());
     }
 }

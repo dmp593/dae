@@ -15,12 +15,20 @@ public class ConfigBean {
     @EJB
     private CourseBean courseBean;
 
+    @EJB
+    private SubjectBean subjectBean;
+
     @PostConstruct
     public void populateDB() {
         System.out.println("Hello Java EE!");
 
-        var courseCode = courseBean.create("EI");
-        studentBean.create("foo", "bar", "foo", "foo@bar.com", courseCode);
+        courseBean.create(9119L, "EI");
+
+        subjectBean.create(1L, "Desenvolvimento de Aplicações Empresariais", "2017/18", "2021/22", 9119L);
+
+        studentBean.create("foo", "bar", "foo", "foo@bar.com", 9119L);
+
+        studentBean.enroll("foo", 1L);
     }
 
 }
