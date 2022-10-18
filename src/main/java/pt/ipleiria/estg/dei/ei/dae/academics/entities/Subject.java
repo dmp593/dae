@@ -15,7 +15,7 @@ import java.util.List;
                 query = "SELECT s FROM Subject s ORDER BY s.course.name, s.scholarYear DESC, s.courseYear, s.name"
         )
 })
-public class Subject {
+public class Subject extends Versionable {
 
     @Id
     private Long code;

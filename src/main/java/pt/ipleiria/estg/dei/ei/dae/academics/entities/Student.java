@@ -20,7 +20,7 @@ public class Student extends User {
     @NotNull
     private Course course;
 
-    @ManyToMany(mappedBy = "students", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "students", fetch = FetchType.LAZY)
     private List<Subject> subjects;
 
     public Student() {

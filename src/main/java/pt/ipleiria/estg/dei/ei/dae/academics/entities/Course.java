@@ -14,7 +14,7 @@ import java.util.Objects;
                 query = "SELECT course FROM Course course ORDER BY course.name"
         )
 })
-public class Course {
+public class Course extends Versionable {
 
     @Id
     private Long code;

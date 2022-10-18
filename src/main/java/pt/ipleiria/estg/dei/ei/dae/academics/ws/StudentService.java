@@ -1,18 +1,21 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.ws;
 
 
-import org.hibernate.Hibernate;
+import pt.ipleiria.estg.dei.ei.dae.academics.dtos.PaginatedDTO;
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.StudentDTO;
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.SubjectDTO;
 import pt.ipleiria.estg.dei.ei.dae.academics.ejbs.StudentBean;
 import pt.ipleiria.estg.dei.ei.dae.academics.entities.Student;
+import pt.ipleiria.estg.dei.ei.dae.academics.exceptions.MyConstraintViolationException;
+import pt.ipleiria.estg.dei.ei.dae.academics.requests.PageRequest;
 
 import javax.ejb.EJB;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Path("students")
 @Produces({MediaType.APPLICATION_JSON})
@@ -24,8 +27,17 @@ public class StudentService {
 
     @GET
     @Path("/")
-    public List<StudentDTO> getAll() {
-        return StudentDTO.from(studentBean.getAll());
+    public Response all(@BeanParam @Valid PageRequest pageRequest) {
+        var count = studentBean.count();
+
+        if (pageRequest.getOffset() > count) {
+            return Response.ok(new PaginatedDTO<>(count)).build();
+        }
+
+        var students = studentBean.getAll(pageRequest.getOffset(), pageRequest.getLimit());
+        var paginatedDTO = new PaginatedDTO<>(StudentDTO.from(students), count, pageRequest.getOffset());
+
+        return Response.ok(paginatedDTO).build();
     }
 
     @GET
@@ -55,7 +67,7 @@ public class StudentService {
 
     @POST
     @Path("/")
-    public Response createNewStudent (StudentDTO studentDTO){
+    public Response create(StudentDTO studentDTO) throws MyConstraintViolationException {
         studentBean.create(
                 studentDTO.getUsername(),
                 studentDTO.getPassword(),
@@ -65,8 +77,6 @@ public class StudentService {
         );
 
         var student = studentBean.find(studentDTO.getUsername());
-        if(student == null) return Response.status(Response.Status.BAD_REQUEST).build();
-
         return Response.status(Response.Status.CREATED).entity(StudentDTO.from(student)).build();
     }
 }

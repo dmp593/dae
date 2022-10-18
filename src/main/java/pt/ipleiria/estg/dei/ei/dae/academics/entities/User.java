@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class User {
+public class User extends Versionable {
 
     @Id
     protected String username;
