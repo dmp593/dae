@@ -1,7 +1,7 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.ws;
 
 
-import pt.ipleiria.estg.dei.ei.dae.academics.dtos.PaginatedDTO;
+import pt.ipleiria.estg.dei.ei.dae.academics.dtos.PaginatedDTOs;
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.StudentDTO;
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.SubjectDTO;
 import pt.ipleiria.estg.dei.ei.dae.academics.ejbs.StudentBean;
@@ -14,8 +14,6 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
-import java.util.Objects;
 
 @Path("students")
 @Produces({MediaType.APPLICATION_JSON})
@@ -31,11 +29,11 @@ public class StudentService {
         var count = studentBean.count();
 
         if (pageRequest.getOffset() > count) {
-            return Response.ok(new PaginatedDTO<>(count)).build();
+            return Response.ok(new PaginatedDTOs<>(count)).build();
         }
 
         var students = studentBean.getAll(pageRequest.getOffset(), pageRequest.getLimit());
-        var paginatedDTO = new PaginatedDTO<>(StudentDTO.from(students), count, pageRequest.getOffset());
+        var paginatedDTO = new PaginatedDTOs<>(StudentDTO.from(students), count, pageRequest.getOffset());
 
         return Response.ok(paginatedDTO).build();
     }

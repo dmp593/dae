@@ -1,7 +1,7 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.ws;
 
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.CourseDTO;
-import pt.ipleiria.estg.dei.ei.dae.academics.dtos.PaginatedDTO;
+import pt.ipleiria.estg.dei.ei.dae.academics.dtos.PaginatedDTOs;
 import pt.ipleiria.estg.dei.ei.dae.academics.requests.PageRequest;
 import pt.ipleiria.estg.dei.ei.dae.academics.ejbs.CourseBean;
 
@@ -10,7 +10,6 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.LinkedList;
 
 @Path("courses")
 @Produces({MediaType.APPLICATION_JSON})
@@ -26,12 +25,12 @@ public class CourseService {
         var count = courseBean.count();
 
         if (pageRequest.getOffset() > count) {
-            return Response.ok(new PaginatedDTO<>(count)).build();
+            return Response.ok(new PaginatedDTOs<>(count)).build();
         }
 
         var courses = courseBean.getAll(pageRequest.getOffset(), pageRequest.getLimit());
 
-        var paginatedDTO = new PaginatedDTO<>(CourseDTO.from(courses), count, pageRequest.getOffset());
+        var paginatedDTO = new PaginatedDTOs<>(CourseDTO.from(courses), count, pageRequest.getOffset());
         return Response.ok(paginatedDTO).build();
     }
 
