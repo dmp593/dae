@@ -2,17 +2,26 @@ package pt.ipleiria.estg.dei.ei.dae.academics.dtos;
 
 import pt.ipleiria.estg.dei.ei.dae.academics.entities.Student;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class StudentDTO implements Serializable {
 
+    @NotNull
     private String username;
+
+    @NotNull
     private String password;
+
+    @NotNull
     private String name;
+
+    @NotNull
     private String email;
 
+    @NotNull
     private Long courseCode;
 
     private String courseName;

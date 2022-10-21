@@ -1,5 +1,6 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.ejbs;
 
+import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.academics.entities.Teacher;
 
 import javax.ejb.EJB;
@@ -25,17 +26,24 @@ public class TeacherBean {
         return em.find(Teacher.class, username);
     }
 
+    public Teacher findOrFail(String username) {
+        var teacher = em.getReference(Teacher.class, username);
+        Hibernate.initialize(teacher);
+
+        return teacher;
+    }
+
     public void teach(String teacherUsername, Long subjectCode) {
-        var teacher = this.find(teacherUsername);
-        var subject = subjectBean.find(subjectCode);
+        var teacher = findOrFail(teacherUsername);
+        var subject = subjectBean.findOrFail(subjectCode);
 
         teacher.addSubject(subject);
         subject.addTeacher(teacher);
     }
 
     public void unteach(String teacherUsername, Long subjectCode) {
-        var teacher = this.find(teacherUsername);
-        var subject = subjectBean.find(subjectCode);
+        var teacher = findOrFail(teacherUsername);
+        var subject = subjectBean.findOrFail(subjectCode);
 
         subject.removeTeacher(teacher);
         teacher.removeSubject(subject);

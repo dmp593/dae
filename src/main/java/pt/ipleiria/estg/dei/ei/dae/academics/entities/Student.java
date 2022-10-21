@@ -10,6 +10,10 @@ import java.util.List;
         @NamedQuery(
                 name = "getAllStudents",
                 query = "SELECT s FROM Student s ORDER BY s.name"
+        ),
+        @NamedQuery(
+                name = "getAllSubjectsUnrolled",
+                query = "SELECT s FROM Subject s WHERE s.code NOT IN (SELECT ss.subjectCode FROM SubjectStudent ss WHERE ss.studentUsername = :username) AND s.course.code = :courseCode"
         )
 })
 public class Student extends User {

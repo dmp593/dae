@@ -6,7 +6,7 @@ import pt.ipleiria.estg.dei.ei.dae.academics.dtos.StudentDTO;
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.SubjectDTO;
 import pt.ipleiria.estg.dei.ei.dae.academics.ejbs.StudentBean;
 import pt.ipleiria.estg.dei.ei.dae.academics.entities.Student;
-import pt.ipleiria.estg.dei.ei.dae.academics.exceptions.MyConstraintViolationException;
+import pt.ipleiria.estg.dei.ei.dae.academics.exceptions.StudentNotInTheSameSubjectCourseException;
 import pt.ipleiria.estg.dei.ei.dae.academics.requests.PageRequest;
 
 import javax.ejb.EJB;
@@ -41,31 +41,39 @@ public class StudentService {
     @GET
     @Path("{username}")
     public Response get(@PathParam("username") String username) {
-        Student student = studentBean.find(username);
-
-        if (student == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity("STUDENT_NOT_FOUND").build();
-        }
-
-        return Response.ok(StudentDTO.from(student)).build();
+        return Response.ok(StudentDTO.from(studentBean.findOrFail(username))).build();
     }
 
 
     @GET
     @Path("{username}/subjects")
-    public Response subjects(@PathParam("username") String username) {
-        Student student = studentBean.find(username);
-        if (student == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity("STUDENT_NOT_FOUND").build();
-        }
-
-        return Response.ok(SubjectDTO.from(student.getSubjects())).build();
+    public Response enrolled(@PathParam("username") String username) {
+        return Response.ok(SubjectDTO.from(studentBean.enrolled(username))).build();
     }
 
+    @GET
+    @Path("{username}/subjects/unrolled")
+    public Response unrolled(@PathParam("username") String username) {
+        return Response.ok(SubjectDTO.from(studentBean.unrolled(username))).build();
+    }
+
+    @PATCH
+    @Path("{username}/subjects/{code}/enroll")
+    public Response enroll(@PathParam("username") String studentUsername, @PathParam("code") Long subjectCode) throws StudentNotInTheSameSubjectCourseException {
+        studentBean.enroll(studentUsername, subjectCode);
+        return Response.noContent().build();
+    }
+
+    @PATCH
+    @Path("{username}/subjects/{code}/unroll")
+    public Response unroll(@PathParam("username") String studentUsername, @PathParam("code") Long subjectCode) throws StudentNotInTheSameSubjectCourseException {
+        studentBean.unroll(studentUsername, subjectCode);
+        return Response.noContent().build();
+    }
 
     @POST
     @Path("/")
-    public Response create(StudentDTO studentDTO) throws MyConstraintViolationException {
+    public Response create(StudentDTO studentDTO) {
         studentBean.create(
                 studentDTO.getUsername(),
                 studentDTO.getPassword(),

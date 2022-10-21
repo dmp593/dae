@@ -1,15 +1,13 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.ejbs;
 
-import pt.ipleiria.estg.dei.ei.dae.academics.entities.Course;
+import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.academics.entities.Student;
-import pt.ipleiria.estg.dei.ei.dae.academics.exceptions.MyConstraintViolationException;
-import pt.ipleiria.estg.dei.ei.dae.academics.exceptions.MyEntityExistsException;
-import pt.ipleiria.estg.dei.ei.dae.academics.exceptions.MyEntityNotFoundException;
+import pt.ipleiria.estg.dei.ei.dae.academics.entities.Subject;
+import pt.ipleiria.estg.dei.ei.dae.academics.exceptions.StudentNotInTheSameSubjectCourseException;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.*;
-import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,40 +23,16 @@ public class StudentBean {
     @EJB
     private SubjectBean subjectBean;
 
-    public boolean exists(String username) {
-        var query = em.createQuery("SELECT COUNT(s.username) FROM Student s WHERE s.username = :username", Long.class);
-        query.setParameter("username", username);
-        return query.getFirstResult() > 0;
-    }
+    public void create(String username, String password, String name, String email, Long courseCode) {
+        var course = courseBean.findOrFail(courseCode);
+        var student = new Student(username, password, name, email, course);
 
-    public void create(String username, String password, String name, String email, Long courseCode)
-        throws MyConstraintViolationException {
-        if (exists(username)) {
-            throw new MyEntityExistsException("Student with username '" + username + "' already exists");
-        }
-
-        var course = courseBean.find(courseCode);
-        if (course == null) {
-            throw new MyEntityNotFoundException("Course with code '" + courseCode + "' not found");
-        }
-
-        try {
-            var student = new Student(username, password, name, email, course);
-            course.addStudent(student);
-
-            em.persist(student);
-        } catch (ConstraintViolationException e) {
-            throw new MyConstraintViolationException(e);
-        }
+        course.addStudent(student);
+        em.persist(student);
     }
 
     public void update(String username, String password, String name, String email, Long courseCode) {
-        var student = em.find(Student.class, username);
-
-        if (student == null) {
-            System.err.println("ERROR_STUDENT_NOT_FOUND: " + username);
-            return;
-        }
+        var student = findOrFail(username);
 
         em.lock(student, LockModeType.OPTIMISTIC);
 
@@ -68,19 +42,19 @@ public class StudentBean {
 
         // a "lazy way" that avoids querying the course every time we do an update to the student
         if (!Objects.equals(student.getCourse().getCode(), courseCode)) {
-            var course = em.find(Course.class, courseCode);
-
-            if (course == null) {
-                System.err.println("ERROR_COURSE_NOT_FOUND: " + courseCode);
-                return;
-            }
-
-            student.setCourse(course);
+            student.setCourse(courseBean.findOrFail(courseCode));
         }
     }
 
     public Student find(String username) {
         return em.find(Student.class, username);
+    }
+
+    public Student findOrFail(String username) {
+        var student = em.getReference(Student.class, username);
+        Hibernate.initialize(student);
+
+        return student;
     }
 
     public List<Student> getAll(int offset, int limit) {
@@ -90,29 +64,48 @@ public class StudentBean {
                 .getResultList();
     }
 
-    public long count() {
+    public Long count() {
         return em.createQuery("SELECT COUNT(*) FROM " + Student.class.getSimpleName(), Long.class).getSingleResult();
     }
 
-    public void enroll(String studentUsername, Long subjectCode) {
+    public void enroll(String studentUsername, Long subjectCode) throws StudentNotInTheSameSubjectCourseException {
+        var student = findOrFail(studentUsername);
+        var subject = subjectBean.findOrFail(subjectCode);
 
-        var student = this.find(studentUsername);
-        var subject = subjectBean.find(subjectCode);
-
-        if (! student.getCourse().equals(subject.getCourse())) return;
+        if (! student.getCourse().equals(subject.getCourse())) {
+            throw new StudentNotInTheSameSubjectCourseException(studentUsername, subjectCode);
+        }
 
         student.addSubject(subject);
         subject.addStudent(student);
     }
 
-    public void unroll(String studentUsername, Long subjectCode) {
+    public void unroll(String studentUsername, Long subjectCode) throws StudentNotInTheSameSubjectCourseException {
 
-        var student = this.find(studentUsername);
-        var subject = subjectBean.find(subjectCode);
+        var student = findOrFail(studentUsername);
+        var subject = subjectBean.findOrFail(subjectCode);
 
-        if (! student.getCourse().equals(subject.getCourse())) return;
+        if (! student.getCourse().equals(subject.getCourse())) {
+            throw new StudentNotInTheSameSubjectCourseException(studentUsername, subjectCode);
+        }
 
         subject.removeStudent(student);
         student.removeSubject(subject);
+    }
+
+    public List<Subject> enrolled(String username) {
+        var subjects = findOrFail(username).getSubjects();
+        Hibernate.initialize(subjects);
+
+        return subjects;
+    }
+
+    public List<Subject> unrolled(String username) {
+        var student = findOrFail(username);
+
+        return em.createNamedQuery("getAllSubjectsUnrolled", Subject.class)
+            .setParameter("username", username)
+            .setParameter("courseCode", student.getCourse().getCode())
+            .getResultList();
     }
 }

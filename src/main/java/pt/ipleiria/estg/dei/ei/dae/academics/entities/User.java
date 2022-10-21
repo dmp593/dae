@@ -23,9 +23,7 @@ public class User extends Versionable {
     protected String email;
 
 
-    public User() {
-
-    }
+    public User() {}
 
     public User(String username, String password, String name, String email) {
         this.username = username;

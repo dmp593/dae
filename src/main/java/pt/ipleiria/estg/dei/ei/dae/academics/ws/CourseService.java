@@ -28,7 +28,7 @@ public class CourseService {
             return Response.ok(new PaginatedDTOs<>(count)).build();
         }
 
-        var courses = courseBean.getAll(pageRequest.getOffset(), pageRequest.getLimit());
+        var courses = courseBean.all(pageRequest.getOffset(), pageRequest.getLimit());
 
         var paginatedDTO = new PaginatedDTOs<>(CourseDTO.from(courses), count, pageRequest.getOffset());
         return Response.ok(paginatedDTO).build();
@@ -38,5 +38,30 @@ public class CourseService {
     @Path("{code}")
     public Response get(@PathParam("code") Long code) {
         return Response.ok(CourseDTO.from(courseBean.find(code))).build();
+    }
+
+    @POST
+    @Path("")
+    public Response create(CourseDTO course) {
+        courseBean.create(course.getCode(), course.getName());
+
+        var dto = CourseDTO.from(courseBean.find(course.getCode()));
+        return Response.status(Response.Status.CREATED).entity(dto).build();
+    }
+
+    @PUT
+    @Path("{code}")
+    public Response update(@PathParam("code") Long code, CourseDTO courseDTO) {
+        courseBean.update(code, courseDTO.getName());
+        courseDTO = CourseDTO.from(courseBean.find(courseDTO.getCode()));
+
+        return Response.ok(courseDTO).build();
+    }
+
+    @DELETE
+    @Path("{code}")
+    public Response delete(@PathParam("code") Long code) {
+        courseBean.remove(code);
+        return Response.noContent().build();
     }
 }

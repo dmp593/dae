@@ -1,12 +1,11 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.ejbs;
 
-import pt.ipleiria.estg.dei.ei.dae.academics.exceptions.MyConstraintViolationException;
+import pt.ipleiria.estg.dei.ei.dae.academics.exceptions.StudentNotInTheSameSubjectCourseException;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Startup
@@ -25,7 +24,7 @@ public class ConfigBean {
     private Logger logger = Logger.getLogger("ejbs.ConfigBean");
 
     @PostConstruct
-    public void populateDB() {
+    public void populateDB() throws StudentNotInTheSameSubjectCourseException {
         System.out.println("Hello Java EE!");
 
         courseBean.create(9119L, "EI");
@@ -35,12 +34,10 @@ public class ConfigBean {
         courseBean.create(9738L, "ET");
 
         subjectBean.create(1L, "Desenvolvimento de Aplicações Empresariais", "2017/18", "2021/22", 9119L);
+        subjectBean.create(2L, "Desenvolvimento de Aplicações Distribuidas", "2017/18", "2021/22", 9119L);
+        subjectBean.create(3L, "Cálculo II", "2017/18", "2021/22", 9738L);
 
-        try {
-            studentBean.create("foo", "bar", "foo", "foo@bar.com", 9119L);
-        } catch (MyConstraintViolationException e) {
-            logger.severe(e.getMessage());
-        }
+        studentBean.create("foo", "bar", "foo", "foo@bar.com", 9119L);
 
         studentBean.enroll("foo", 1L);
     }
