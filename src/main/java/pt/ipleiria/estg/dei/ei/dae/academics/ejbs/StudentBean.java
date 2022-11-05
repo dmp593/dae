@@ -108,4 +108,10 @@ public class StudentBean {
             .setParameter("courseCode", student.getCourse().getCode())
             .getResultList();
     }
+
+    public boolean isValid(String username, String password) {
+        var student = find(username);
+
+        return student != null && student.getPassword().equals(password);
+    }
 }

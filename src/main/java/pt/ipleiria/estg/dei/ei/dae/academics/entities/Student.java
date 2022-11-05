@@ -11,9 +11,21 @@ import java.util.List;
                 name = "getAllStudents",
                 query = "SELECT s FROM Student s ORDER BY s.name"
         ),
+
+        // SOLUTION 1
         @NamedQuery(
                 name = "getAllSubjectsUnrolled",
-                query = "SELECT s FROM Subject s WHERE s.code NOT IN (SELECT ss.subjectCode FROM SubjectStudent ss WHERE ss.studentUsername = :username) AND s.course.code = :courseCode"
+                query = "SELECT s FROM Subject s WHERE s.code NOT IN" +
+                        "    (SELECT ss.subjectCode FROM SubjectStudent ss WHERE ss.studentUsername = :username) " +
+                        "AND s.course.code = :courseCode"
+        ),
+
+        // SOLUTION 2
+        @NamedQuery(
+                name = "getAllSubjectsUnrolledWithoutUsingPivotEntity",
+                query = "SELECT s FROM Subject s WHERE s NOT IN " +
+                        "   (SELECT s FROM Student st JOIN st.subjects s WHERE st.username = :username) " +
+                        "AND s.course.code = :courseCode"
         )
 })
 public class Student extends User {

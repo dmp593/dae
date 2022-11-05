@@ -1,15 +1,20 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.ws;
 
 
+import pt.ipleiria.estg.dei.ei.dae.academics.dtos.EmailDTO;
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.PaginatedDTOs;
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.StudentDTO;
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.SubjectDTO;
+import pt.ipleiria.estg.dei.ei.dae.academics.ejbs.EmailBean;
 import pt.ipleiria.estg.dei.ei.dae.academics.ejbs.StudentBean;
 import pt.ipleiria.estg.dei.ei.dae.academics.entities.Student;
 import pt.ipleiria.estg.dei.ei.dae.academics.exceptions.StudentNotInTheSameSubjectCourseException;
 import pt.ipleiria.estg.dei.ei.dae.academics.requests.PageRequest;
+import pt.ipleiria.estg.dei.ei.dae.academics.security.Authorized;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -18,10 +23,14 @@ import javax.ws.rs.core.Response;
 @Path("students")
 @Produces({MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_JSON})
+@RolesAllowed({"Teacher"})
 public class StudentService {
 
     @EJB
     private StudentBean studentBean;
+
+    @EJB
+    private EmailBean emailBean;
 
     @GET
     @Path("/")
@@ -39,6 +48,8 @@ public class StudentService {
     }
 
     @GET
+    @Authorized
+    @RolesAllowed({"Student"})
     @Path("{username}")
     public Response get(@PathParam("username") String username) {
         return Response.ok(StudentDTO.from(studentBean.findOrFail(username))).build();
@@ -68,6 +79,15 @@ public class StudentService {
     @Path("{username}/subjects/{code}/unroll")
     public Response unroll(@PathParam("username") String studentUsername, @PathParam("code") Long subjectCode) throws StudentNotInTheSameSubjectCourseException {
         studentBean.unroll(studentUsername, subjectCode);
+        return Response.noContent().build();
+    }
+
+    @POST
+    @Path("/{username}/email/send")
+    public Response sendEmail(@PathParam("username") String username, EmailDTO email) throws MessagingException {
+        Student student = studentBean.findOrFail(username);
+
+        emailBean.send(student.getEmail(), email.getSubject(), email.getMessage());
         return Response.noContent().build();
     }
 

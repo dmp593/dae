@@ -32,7 +32,7 @@ public class Subject extends Versionable {
     @JoinColumn(name = "course_code")
     private Course course;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(
             name = "subjects_students",
             joinColumns = @JoinColumn(name = "subject_code", referencedColumnName = "code"),
@@ -40,7 +40,7 @@ public class Subject extends Versionable {
     )
     private List<Student> students;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(
             name = "subjects_teachers",
             joinColumns = @JoinColumn(name = "subject_code", referencedColumnName = "code"),
