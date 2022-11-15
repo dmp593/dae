@@ -10,20 +10,23 @@ import pt.ipleiria.estg.dei.ei.dae.academics.ejbs.StudentBean;
 import pt.ipleiria.estg.dei.ei.dae.academics.entities.Student;
 import pt.ipleiria.estg.dei.ei.dae.academics.exceptions.StudentNotInTheSameSubjectCourseException;
 import pt.ipleiria.estg.dei.ei.dae.academics.requests.PageRequest;
-import pt.ipleiria.estg.dei.ei.dae.academics.security.Authorized;
+import pt.ipleiria.estg.dei.ei.dae.academics.security.Authenticated;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
-import javax.mail.MessagingException;
-import javax.validation.Valid;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.ejb.EJB;
+import jakarta.mail.MessagingException;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.SecurityContext;
 
-@Path("students")
+@Path("/students")
 @Produces({MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_JSON})
-@RolesAllowed({"Teacher"})
+@Authenticated
+@RolesAllowed({"Teacher", "Administrator"})
 public class StudentService {
 
     @EJB
@@ -31,6 +34,9 @@ public class StudentService {
 
     @EJB
     private EmailBean emailBean;
+
+    @Context
+    private SecurityContext securityContext;
 
     @GET
     @Path("/")
@@ -48,10 +54,14 @@ public class StudentService {
     }
 
     @GET
-    @Authorized
+    @Authenticated
     @RolesAllowed({"Student"})
     @Path("{username}")
     public Response get(@PathParam("username") String username) {
+        if(!securityContext.getUserPrincipal().getName().equals(username)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
         return Response.ok(StudentDTO.from(studentBean.findOrFail(username))).build();
     }
 

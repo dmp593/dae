@@ -2,15 +2,18 @@ package pt.ipleiria.estg.dei.ei.dae.academics.ejbs;
 
 import pt.ipleiria.estg.dei.ei.dae.academics.exceptions.StudentNotInTheSameSubjectCourseException;
 
-import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
+import jakarta.annotation.PostConstruct;
+import jakarta.ejb.EJB;
+import jakarta.ejb.Singleton;
+import jakarta.ejb.Startup;
 import java.util.logging.Logger;
 
 @Startup
 @Singleton
 public class ConfigBean {
+
+    @EJB
+    private AdministratorBean administratorBean;
 
     @EJB
     private StudentBean studentBean;
@@ -27,6 +30,8 @@ public class ConfigBean {
     public void populateDB() throws StudentNotInTheSameSubjectCourseException {
         System.out.println("Hello Java EE!");
 
+        administratorBean.create("admin", "admin", "admin", "admin@academics.pt");
+
         courseBean.create(9119L, "EI");
         courseBean.create(9281L, "EE");
         courseBean.create(9823L, "EM");
@@ -38,6 +43,7 @@ public class ConfigBean {
         subjectBean.create(3L, "Cálculo II", "2017/18", "2021/22", 9738L);
 
         studentBean.create("foo", "bar", "foo", "foo@bar.com", 9119L);
+        studentBean.create("student", "secret", "student", "student@my.ipleiria.pt", 9119L);
 
         studentBean.enroll("foo", 1L);
     }

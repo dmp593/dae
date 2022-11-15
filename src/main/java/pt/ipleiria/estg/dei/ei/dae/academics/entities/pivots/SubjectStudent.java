@@ -1,6 +1,6 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.entities.pivots;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity

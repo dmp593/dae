@@ -4,12 +4,14 @@ import pt.ipleiria.estg.dei.ei.dae.academics.dtos.CourseDTO;
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.PaginatedDTOs;
 import pt.ipleiria.estg.dei.ei.dae.academics.requests.PageRequest;
 import pt.ipleiria.estg.dei.ei.dae.academics.ejbs.CourseBean;
+import pt.ipleiria.estg.dei.ei.dae.academics.security.Authenticated;
 
-import javax.ejb.EJB;
-import javax.validation.Valid;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.ejb.EJB;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 @Path("courses")
 @Produces({MediaType.APPLICATION_JSON})
@@ -42,6 +44,8 @@ public class CourseService {
 
     @POST
     @Path("")
+    @Authenticated
+    @RolesAllowed({"Administrator"})
     public Response create(CourseDTO course) {
         courseBean.create(course.getCode(), course.getName());
 

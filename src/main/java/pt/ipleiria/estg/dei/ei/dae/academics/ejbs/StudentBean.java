@@ -4,10 +4,12 @@ import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.academics.entities.Student;
 import pt.ipleiria.estg.dei.ei.dae.academics.entities.Subject;
 import pt.ipleiria.estg.dei.ei.dae.academics.exceptions.StudentNotInTheSameSubjectCourseException;
+import pt.ipleiria.estg.dei.ei.dae.academics.security.Hasher;
 
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.persistence.*;
+import jakarta.ejb.EJB;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
+import jakarta.persistence.*;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,13 +25,18 @@ public class StudentBean {
     @EJB
     private SubjectBean subjectBean;
 
+    @Inject
+    private Hasher hasher;
+
     public void create(String username, String password, String name, String email, Long courseCode) {
         var course = courseBean.findOrFail(courseCode);
-        var student = new Student(username, password, name, email, course);
+        var student = new Student(username, hasher.hash(password), name, email, course);
 
         course.addStudent(student);
         em.persist(student);
     }
+
+    // the rest of the code ...
 
     public void update(String username, String password, String name, String email, Long courseCode) {
         var student = findOrFail(username);
@@ -107,11 +114,5 @@ public class StudentBean {
             .setParameter("username", username)
             .setParameter("courseCode", student.getCourse().getCode())
             .getResultList();
-    }
-
-    public boolean isValid(String username, String password) {
-        var student = find(username);
-
-        return student != null && student.getPassword().equals(password);
     }
 }

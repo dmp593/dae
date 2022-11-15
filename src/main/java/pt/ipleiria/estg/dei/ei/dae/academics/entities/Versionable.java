@@ -1,7 +1,7 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.entities;
 
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Version;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Version;
 
 @MappedSuperclass
 public class Versionable {

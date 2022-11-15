@@ -1,8 +1,8 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.requests;
 
-import javax.validation.constraints.PositiveOrZero;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.QueryParam;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.QueryParam;
 
 public class PageRequest {
     @QueryParam("offset")

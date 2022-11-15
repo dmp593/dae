@@ -1,4 +1,3 @@
-# if problems with elytron, use version 24.0.0.Final
 FROM quay.io/wildfly/wildfly:latest
 
 ENV WILDFLY_HOME=/opt/jboss/wildfly
@@ -8,7 +7,7 @@ COPY scripts ${WILDFLY_HOME}/bin
 
 USER root
 
-RUN yum install -y dos2unix nano
+RUN yum install -y dos2unix nano nc
 RUN dos2unix ${WILDFLY_HOME}/bin/*.sh
 
 RUN chown jboss:jboss ${WILDFLY_HOME}/bin/*.sh

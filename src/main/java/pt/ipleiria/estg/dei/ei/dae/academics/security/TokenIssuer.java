@@ -9,17 +9,20 @@ import java.time.ZoneId;
 import java.util.Date;
 
 public class TokenIssuer {
-    //Expiration time of token would be 60 mins
+
+    protected static final byte[] SECRET_KEY = "secret".getBytes();
+    protected static final String ALGORITHM = "DES";
+
     public static final long EXPIRY_MINS = 60L;
 
-    public String issueToken(String username) {
-        LocalDateTime expiryPeriod = LocalDateTime.now().plusMinutes(EXPIRY_MINS);
+    public String issue(String username) {
+        var expiryPeriod = LocalDateTime.now().plusMinutes(EXPIRY_MINS);
 
-        Date expirationDateTime = Date.from(
+        var expirationDateTime = Date.from(
                 expiryPeriod.atZone(ZoneId.systemDefault()).toInstant()
         );
 
-        Key key = new SecretKeySpec("secret".getBytes(), "DES");
+        Key key = new SecretKeySpec(SECRET_KEY, ALGORITHM);
 
         return Jwts.builder()
                 .setSubject(username)

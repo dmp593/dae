@@ -2,7 +2,7 @@ package pt.ipleiria.estg.dei.ei.dae.academics.dtos;
 
 import pt.ipleiria.estg.dei.ei.dae.academics.entities.Student;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;

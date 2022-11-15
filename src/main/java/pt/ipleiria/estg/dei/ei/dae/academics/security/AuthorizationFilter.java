@@ -1,84 +1,141 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.security;
 
-import io.jsonwebtoken.Jwts;
-import org.hibernate.Hibernate;
-import pt.ipleiria.estg.dei.ei.dae.academics.ejbs.StudentBean;
+import jakarta.annotation.Priority;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
+import org.jboss.resteasy.core.ResourceMethodInvoker;
 
-import javax.annotation.Priority;
-import javax.crypto.spec.SecretKeySpec;
-import javax.ejb.EJB;
-import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.Provider;
-import java.security.Key;
-import java.security.Principal;
+import jakarta.annotation.security.DenyAll;
+import jakarta.annotation.security.PermitAll;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.ext.Provider;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashSet;
+
+
+/*
+In the following cases, the method level annotations take precedence over the class level annotation:
+
+@PermitAll is specified at the class level and @RolesAllowed or @DenyAll are specified on methods of the same class;
+
+@DenyAll is specified at the class level and @PermitAll or @RolesAllowed are specified on methods of the same class;
+
+@RolesAllowed is specified at the class level and @PermitAll or @DenyAll are specified on methods of the same class.
+
+* */
 
 @Provider
-@Authorized
-@Priority(Priorities.AUTHENTICATION)
+@Authenticated
+@Priority(Priorities.AUTHORIZATION)
 public class AuthorizationFilter implements ContainerRequestFilter {
-
-    @EJB
-    private StudentBean studentBean;
+    private static final Response ACCESS_DENIED = Response.status(401).entity("Access denied for this resource").build();
+    private static final Response ACCESS_FORBIDDEN = Response.status(403).entity("Access forbidden for this resource").build();
 
     @Context
-    private UriInfo uriInfo;
+    private SecurityContext securityContext;
 
     @Override
-    public void filter(ContainerRequestContext requestContext) {
-        String header = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+    public void filter(ContainerRequestContext containerRequestContext) {
+        var methodInvoker = (ResourceMethodInvoker) containerRequestContext.getProperty("org.jboss.resteasy.core.ResourceMethodInvoker");
+        Method method = methodInvoker.getMethod();
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new NotAuthorizedException("Authorization header must be provided");
+        var resource = method.getDeclaringClass();
+
+        // If authenticated, access granted for all roles
+        if (resource.isAnnotationPresent(PermitAll.class)) {
+            if (method.isAnnotationPresent(DenyAll.class)) {
+                containerRequestContext.abortWith(ACCESS_DENIED);
+                return;
+            }
+
+            //Verify user access
+            if (method.isAnnotationPresent(RolesAllowed.class)) {
+                RolesAllowed rolesAnnotation = method.getAnnotation(RolesAllowed.class);
+                var roles = new HashSet<>(Arrays.asList(rolesAnnotation.value()));
+
+                //Is user valid?
+                if(roles.stream().anyMatch(securityContext::isUserInRole)) {
+                    return;
+                }
+
+                containerRequestContext.abortWith(ACCESS_FORBIDDEN);
+                return;
+            }
         }
-        // Get token from the HTTP Authorization header
-        String token = header.substring("Bearer".length()).trim();
 
-        String username = getUserIfValid(token);
-        var user = studentBean.findOrFail(username);
-
-        requestContext.setSecurityContext(new SecurityContext() {
-            @Override
-            public Principal getUserPrincipal() {
-                return user::getUsername;
+        // Access denied for all
+        if(resource.isAnnotationPresent(DenyAll.class)) {
+            if (method.isAnnotationPresent(PermitAll.class)) {
+                return;
             }
 
-            @Override
-            public boolean isUserInRole(String s) {
-                return org.hibernate.Hibernate.getClass(user).getSimpleName().equals(s);
+            //Verify user access
+            if (method.isAnnotationPresent(RolesAllowed.class)) {
+                RolesAllowed beanRolesAnnotation = method.getAnnotation(RolesAllowed.class);
+                var roles = new HashSet<>(Arrays.asList(beanRolesAnnotation.value()));
+
+                //Is user valid?
+                if(roles.stream().anyMatch(securityContext::isUserInRole)) {
+                    return;
+                }
             }
 
-            @Override
-            public boolean isSecure() {
-                return uriInfo.getAbsolutePath().toString().startsWith("https");
+            containerRequestContext.abortWith(ACCESS_DENIED);
+            return;
+        }
+
+        if (resource.isAnnotationPresent(RolesAllowed.class)) {
+            if (method.isAnnotationPresent(DenyAll.class)) {
+                containerRequestContext.abortWith(ACCESS_DENIED);
+                return;
             }
 
-            @Override
-            public String getAuthenticationScheme() {
-                return "Bearer";
+            if (method.isAnnotationPresent(PermitAll.class)) {
+                return;
             }
-        });
 
+            RolesAllowed rolesAnnotation = resource.getAnnotation(RolesAllowed.class);
+            var roles = new HashSet<>(Arrays.asList(rolesAnnotation.value()));
 
-    }
+            //Verify user access
+            if (method.isAnnotationPresent(RolesAllowed.class)) {
+                rolesAnnotation = method.getAnnotation(RolesAllowed.class);
+                roles.addAll(Arrays.asList(rolesAnnotation.value()));
+            }
 
-    private String getUserIfValid(String token) {
-        Key key = new SecretKeySpec("secret".getBytes(), "DES");
-        try {
-            return Jwts.parser().setSigningKey(key)
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .getSubject();
-        } catch (Exception e) {
-            //don't trust the JWT!
-            throw new NotAuthorizedException("Invalid JWT");
+            //Is user valid?
+            if(roles.stream().anyMatch(securityContext::isUserInRole)) {
+                return;
+            }
+
+            containerRequestContext.abortWith(ACCESS_FORBIDDEN);
+            return;
+        }
+
+        if (method.isAnnotationPresent(DenyAll.class)) {
+            containerRequestContext.abortWith(ACCESS_DENIED);
+            return;
+        }
+
+        if (method.isAnnotationPresent(PermitAll.class)) {
+            return;
+        }
+
+        //Verify user access
+        if (method.isAnnotationPresent(RolesAllowed.class)) {
+            var roles = new HashSet<>(Arrays.asList(method.getAnnotation(RolesAllowed.class).value()));
+
+            //Is user valid?
+            if(roles.stream().anyMatch(securityContext::isUserInRole)) {
+                return;
+            }
+
+            containerRequestContext.abortWith(ACCESS_FORBIDDEN);
         }
     }
-
 }

@@ -1,15 +1,15 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.ws;
 
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.Auth;
-import pt.ipleiria.estg.dei.ei.dae.academics.ejbs.StudentBean;
+import pt.ipleiria.estg.dei.ei.dae.academics.ejbs.UserBean;
 import pt.ipleiria.estg.dei.ei.dae.academics.security.TokenIssuer;
 
-import javax.ejb.EJB;
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ejb.EJB;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 @Path("auth")
 @Produces({MediaType.APPLICATION_JSON})
@@ -19,13 +19,13 @@ public class AuthService {
     private TokenIssuer issuer;
 
     @EJB
-    private StudentBean studentBean;
+    private UserBean userBean;
 
     @POST
     @Path("/login")
     public Response authenticate(@Valid Auth auth) {
-        if (studentBean.isValid(auth.getUsername(), auth.getPassword())) {
-            String token = issuer.issueToken(auth.getUsername());
+        if (userBean.canLogin(auth.getUsername(), auth.getPassword())) {
+            String token = issuer.issue(auth.getUsername());
             return Response.ok(token).build();
         }
 

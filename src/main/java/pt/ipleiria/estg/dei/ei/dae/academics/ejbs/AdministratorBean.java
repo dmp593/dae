@@ -2,10 +2,12 @@ package pt.ipleiria.estg.dei.ei.dae.academics.ejbs;
 
 import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.academics.entities.Administrator;
+import pt.ipleiria.estg.dei.ei.dae.academics.security.Hasher;
 
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @Stateless
 public class AdministratorBean {
@@ -13,8 +15,11 @@ public class AdministratorBean {
     @PersistenceContext
     private EntityManager em;
 
+    @Inject
+    private Hasher hasher;
+
     public void create(String username, String password, String name, String email) {
-        var admin = new Administrator(username, password, name, email);
+        var admin = new Administrator(username, hasher.hash(password), name, email);
         em.persist(admin);
     }
 

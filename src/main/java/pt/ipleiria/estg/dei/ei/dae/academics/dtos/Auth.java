@@ -1,6 +1,6 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.dtos;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 public class Auth implements Serializable {
