@@ -1,17 +1,17 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.security;
 
 import io.jsonwebtoken.Jwts;
-import jakarta.annotation.Priority;
-import jakarta.ejb.EJB;
-import jakarta.ws.rs.NotAuthorizedException;
-import jakarta.ws.rs.Priorities;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.container.ContainerRequestFilter;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.SecurityContext;
-import jakarta.ws.rs.core.UriInfo;
-import jakarta.ws.rs.ext.Provider;
+import javax.annotation.Priority;
+import javax.ejb.EJB;
+import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.Priorities;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.Provider;
 import pt.ipleiria.estg.dei.ei.dae.academics.ejbs.UserBean;
 
 import javax.crypto.spec.SecretKeySpec;

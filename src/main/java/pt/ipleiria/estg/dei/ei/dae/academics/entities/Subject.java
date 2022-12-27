@@ -1,6 +1,6 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.entities;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

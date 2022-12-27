@@ -6,10 +6,10 @@ import pt.ipleiria.estg.dei.ei.dae.academics.entities.Subject;
 import pt.ipleiria.estg.dei.ei.dae.academics.exceptions.StudentNotInTheSameSubjectCourseException;
 import pt.ipleiria.estg.dei.ei.dae.academics.security.Hasher;
 
-import jakarta.ejb.EJB;
-import jakarta.ejb.Stateless;
-import jakarta.inject.Inject;
-import jakarta.persistence.*;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
 

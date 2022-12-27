@@ -1,7 +1,7 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.entities;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

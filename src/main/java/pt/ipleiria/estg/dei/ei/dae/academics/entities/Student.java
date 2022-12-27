@@ -1,7 +1,8 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.entities;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,14 +40,19 @@ public class Student extends User {
     @ManyToMany(mappedBy = "students", fetch = FetchType.LAZY)
     private List<Subject> subjects;
 
+    @OneToMany(mappedBy = "student")
+    private List<Document> documents;
+
     public Student() {
         this.subjects = new ArrayList<>();
+        this.documents = new ArrayList<>();
     }
 
     public Student(String username, String password, String name, String email, Course course) {
         super(username, password, name, email);
         this.course = course;
         this.subjects = new ArrayList<>();
+        this.documents = new ArrayList<>();
     }
 
     public Course getCourse() {
@@ -65,6 +71,14 @@ public class Student extends User {
         this.subjects = subjects;
     }
 
+    public List<Document> getDocuments() {
+        return this.documents;
+    }
+
+    public void setDocuments(List<Document> documents) {
+        this.documents = documents;
+    }
+
     public void addSubject(Subject subject) {
         if (! this.subjects.contains(subject)) {
             this.subjects.add(subject);
@@ -73,5 +87,15 @@ public class Student extends User {
 
     public void removeSubject(Subject subject) {
         this.subjects.remove(subject);
+    }
+
+    public void addDocument(Document document) {
+        if (! this.documents.contains(document)) {
+            this.documents.add(document);
+        }
+    }
+
+    public void removeDocument(Document document) {
+        this.documents.remove(document);
     }
 }

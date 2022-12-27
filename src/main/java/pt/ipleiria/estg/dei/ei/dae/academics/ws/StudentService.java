@@ -3,6 +3,7 @@ package pt.ipleiria.estg.dei.ei.dae.academics.ws;
 
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.EmailDTO;
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.PaginatedDTOs;
+import pt.ipleiria.estg.dei.ei.dae.academics.dtos.StudentCreateDTO;
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.StudentDTO;
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.SubjectDTO;
 import pt.ipleiria.estg.dei.ei.dae.academics.ejbs.EmailBean;
@@ -12,15 +13,15 @@ import pt.ipleiria.estg.dei.ei.dae.academics.exceptions.StudentNotInTheSameSubje
 import pt.ipleiria.estg.dei.ei.dae.academics.requests.PageRequest;
 import pt.ipleiria.estg.dei.ei.dae.academics.security.Authenticated;
 
-import jakarta.annotation.security.RolesAllowed;
-import jakarta.ejb.EJB;
-import jakarta.mail.MessagingException;
-import jakarta.validation.Valid;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.SecurityContext;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.EJB;
+import javax.mail.MessagingException;
+import javax.validation.Valid;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 @Path("/students")
 @Produces({MediaType.APPLICATION_JSON})
@@ -67,12 +68,16 @@ public class StudentService {
 
 
     @GET
+    @Authenticated
+    @RolesAllowed({"Student"})
     @Path("{username}/subjects")
     public Response enrolled(@PathParam("username") String username) {
         return Response.ok(SubjectDTO.from(studentBean.enrolled(username))).build();
     }
 
     @GET
+    @Authenticated
+    @RolesAllowed({"Student"})
     @Path("{username}/subjects/unrolled")
     public Response unrolled(@PathParam("username") String username) {
         return Response.ok(SubjectDTO.from(studentBean.unrolled(username))).build();
@@ -103,7 +108,7 @@ public class StudentService {
 
     @POST
     @Path("/")
-    public Response create(StudentDTO studentDTO) {
+    public Response create(StudentCreateDTO studentDTO) {
         studentBean.create(
                 studentDTO.getUsername(),
                 studentDTO.getPassword(),

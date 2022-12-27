@@ -1,6 +1,6 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.security;
 
-import jakarta.ws.rs.NameBinding;
+import javax.ws.rs.NameBinding;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 

@@ -2,9 +2,9 @@ package pt.ipleiria.estg.dei.ei.dae.academics.exceptions.mappers;
 
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.ErrorDTO;
 
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.ext.ExceptionMapper;
-import jakarta.ws.rs.ext.Provider;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
 @Provider
 public class DefaultExceptioMapper implements ExceptionMapper<Exception> {

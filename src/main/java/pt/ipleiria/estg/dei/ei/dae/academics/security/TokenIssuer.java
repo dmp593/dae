@@ -3,6 +3,7 @@ package pt.ipleiria.estg.dei.ei.dae.academics.security;
 import io.jsonwebtoken.*;
 
 import javax.crypto.spec.SecretKeySpec;
+
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneId;

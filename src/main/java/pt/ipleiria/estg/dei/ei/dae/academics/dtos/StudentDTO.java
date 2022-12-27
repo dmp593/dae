@@ -2,7 +2,7 @@ package pt.ipleiria.estg.dei.ei.dae.academics.dtos;
 
 import pt.ipleiria.estg.dei.ei.dae.academics.entities.Student;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,27 +10,23 @@ import java.util.stream.Collectors;
 public class StudentDTO implements Serializable {
 
     @NotNull
-    private String username;
+    protected String username;
 
     @NotNull
-    private String password;
+    protected String name;
 
     @NotNull
-    private String name;
+    protected String email;
 
     @NotNull
-    private String email;
+    protected Long courseCode;
 
-    @NotNull
-    private Long courseCode;
-
-    private String courseName;
+    protected String courseName;
 
     public StudentDTO() {}
 
-    public StudentDTO(String username, String password, String name, String email, Long courseCode, String courseName) {
+    public StudentDTO(String username, String name, String email, Long courseCode, String courseName) {
         this.username = username;
-        this.password = password;
         this.name = name;
         this.email = email;
         this.courseCode = courseCode;
@@ -43,14 +39,6 @@ public class StudentDTO implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getName() {
@@ -88,7 +76,6 @@ public class StudentDTO implements Serializable {
     public static StudentDTO from(Student student) {
         return new StudentDTO(
                 student.getUsername(),
-                student.getPassword(),
                 student.getName(),
                 student.getEmail(),
                 student.getCourse().getCode(),

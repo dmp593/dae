@@ -1,18 +1,18 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.security;
 
-import jakarta.annotation.Priority;
-import jakarta.annotation.security.RolesAllowed;
-import jakarta.ws.rs.Priorities;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response;
+import javax.annotation.Priority;
+import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.Priorities;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 
-import jakarta.annotation.security.DenyAll;
-import jakarta.annotation.security.PermitAll;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.container.ContainerRequestFilter;
-import jakarta.ws.rs.core.SecurityContext;
-import jakarta.ws.rs.ext.Provider;
+import javax.annotation.security.DenyAll;
+import javax.annotation.security.PermitAll;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.ext.Provider;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;

@@ -4,10 +4,10 @@ import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.academics.entities.User;
 import pt.ipleiria.estg.dei.ei.dae.academics.security.Hasher;
 
-import jakarta.ejb.Stateless;
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 @Stateless
 public class UserBean {

@@ -6,12 +6,12 @@ import pt.ipleiria.estg.dei.ei.dae.academics.requests.PageRequest;
 import pt.ipleiria.estg.dei.ei.dae.academics.ejbs.CourseBean;
 import pt.ipleiria.estg.dei.ei.dae.academics.security.Authenticated;
 
-import jakarta.annotation.security.RolesAllowed;
-import jakarta.ejb.EJB;
-import jakarta.validation.Valid;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.EJB;
+import javax.validation.Valid;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 @Path("courses")
 @Produces({MediaType.APPLICATION_JSON})

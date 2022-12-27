@@ -1,13 +1,13 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.exceptions.mappers;
 
 
-import jakarta.validation.ConstraintViolationException;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.ext.ExceptionMapper;
-import jakarta.ws.rs.ext.Provider;
+import javax.validation.ConstraintViolationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 import pt.ipleiria.estg.dei.ei.dae.academics.dtos.ErrorDTO;
 
-import jakarta.ejb.EJBTransactionRolledbackException;
+import javax.ejb.EJBTransactionRolledbackException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 

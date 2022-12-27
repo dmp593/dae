@@ -1,13 +1,13 @@
 package pt.ipleiria.estg.dei.ei.dae.academics.ejbs;
 
-import jakarta.annotation.Resource;
-import jakarta.ejb.Stateless;
-import jakarta.mail.Message;
-import jakarta.mail.MessagingException;
-import jakarta.mail.Session;
-import jakarta.mail.Transport;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
+import javax.annotation.Resource;
+import javax.ejb.Stateless;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.util.Date;
 
 @Stateless
